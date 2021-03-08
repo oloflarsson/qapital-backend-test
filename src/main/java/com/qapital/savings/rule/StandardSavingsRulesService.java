@@ -6,6 +6,7 @@ import com.qapital.savings.event.SavingsEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -49,6 +50,10 @@ public class StandardSavingsRulesService implements SavingsRulesService {
 
     private static List<SavingsEvent> executeRule(SavingsRule savingsRule, Transaction transaction) {
         double savingsAmountTotal = getSavingsAmountTotal(savingsRule, transaction);
+        if (savingsAmountTotal == 0) {
+            return new ArrayList<>();
+        }
+
         double amount = savingsAmountTotal / savingsRule.getSavingsGoalIds().size();
 
         return savingsRule.getSavingsGoalIds().stream()
@@ -60,7 +65,8 @@ public class StandardSavingsRulesService implements SavingsRulesService {
         SavingsRule.RuleType ruleType = savingsRule.getRuleType();
 
         if (ruleType == SavingsRule.RuleType.roundup) {
-            return -transaction.getAmount() % savingsRule.getAmount();
+            double positiveTransactionAmount = Math.abs(transaction.getAmount());
+            return roundupToNearest(positiveTransactionAmount, savingsRule.getAmount()) - positiveTransactionAmount;
         }
 
         if (ruleType == SavingsRule.RuleType.guiltypleasure) {
@@ -72,5 +78,9 @@ public class StandardSavingsRulesService implements SavingsRulesService {
         }
 
         throw new UnsupportedOperationException("Not Implemented: " + ruleType);
+    }
+
+    private static double roundupToNearest(double amount, double multiple) {
+        return multiple * (Math.ceil(amount / multiple));
     }
 }
