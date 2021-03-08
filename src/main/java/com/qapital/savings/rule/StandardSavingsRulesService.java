@@ -23,7 +23,6 @@ public class StandardSavingsRulesService implements SavingsRulesService {
 
     @Override
     public List<SavingsRule> activeRulesForUser(Long userId) {
-
         SavingsRule guiltyPleasureRule = SavingsRule.createGuiltyPleasureRule(1l, userId, "Starbucks", 3.00d);
         guiltyPleasureRule.addSavingsGoal(1l);
         guiltyPleasureRule.addSavingsGoal(2l);

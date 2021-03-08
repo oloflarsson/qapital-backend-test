@@ -24,6 +24,4 @@ public class SavingsRulesController {
         return savingsRulesService.activeRulesForUser(userId);
     }
 
-
-
 }
