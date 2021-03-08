@@ -24,11 +24,11 @@ public class StandardSavingsRulesService implements SavingsRulesService {
 
     @Override
     public List<SavingsRule> activeRulesForUser(Long userId) {
-        SavingsRule guiltyPleasureRule = SavingsRule.createGuiltyPleasureRule(1l, userId, "Starbucks", 3.00d);
-        guiltyPleasureRule.addSavingsGoal(1l);
-        guiltyPleasureRule.addSavingsGoal(2l);
-        SavingsRule roundupRule = SavingsRule.createRoundupRule(2l, userId, 2.00d);
-        roundupRule.addSavingsGoal(1l);
+        SavingsRule guiltyPleasureRule = SavingsRule.createGuiltyPleasureRule(1L, userId, "Starbucks", 3.00d);
+        guiltyPleasureRule.addSavingsGoal(1L);
+        guiltyPleasureRule.addSavingsGoal(2L);
+        SavingsRule roundupRule = SavingsRule.createRoundupRule(2L, userId, 2.00d);
+        roundupRule.addSavingsGoal(1L);
 
         return List.of(guiltyPleasureRule, roundupRule);
     }
@@ -42,13 +42,13 @@ public class StandardSavingsRulesService implements SavingsRulesService {
                 .collect(Collectors.toList());
     }
 
-    private static boolean isApplicable(SavingsRule savingsRule, Transaction transaction) {
+    static boolean isApplicable(SavingsRule savingsRule, Transaction transaction) {
         return Objects.equals(savingsRule.getUserId(), transaction.getUserId()) &&
                 savingsRule.isActive() &&
                 transaction.getAmount() < 0;
     }
 
-    private static List<SavingsEvent> executeRule(SavingsRule savingsRule, Transaction transaction) {
+    static List<SavingsEvent> executeRule(SavingsRule savingsRule, Transaction transaction) {
         double savingsAmountTotal = getSavingsAmountTotal(savingsRule, transaction);
         if (savingsAmountTotal == 0) {
             return new ArrayList<>();
@@ -61,12 +61,11 @@ public class StandardSavingsRulesService implements SavingsRulesService {
                 .collect(Collectors.toList());
     }
 
-    private static double getSavingsAmountTotal(SavingsRule savingsRule, Transaction transaction) {
+    static double getSavingsAmountTotal(SavingsRule savingsRule, Transaction transaction) {
         SavingsRule.RuleType ruleType = savingsRule.getRuleType();
 
         if (ruleType == SavingsRule.RuleType.roundup) {
-            double positiveTransactionAmount = Math.abs(transaction.getAmount());
-            return roundupToNearest(positiveTransactionAmount, savingsRule.getAmount()) - positiveTransactionAmount;
+            return getRoundupRuleAmount(transaction.getAmount(), savingsRule.getAmount());
         }
 
         if (ruleType == SavingsRule.RuleType.guiltypleasure) {
@@ -80,7 +79,12 @@ public class StandardSavingsRulesService implements SavingsRulesService {
         throw new UnsupportedOperationException("Not Implemented: " + ruleType);
     }
 
-    private static double roundupToNearest(double amount, double multiple) {
-        return multiple * (Math.ceil(amount / multiple));
+    static double getRoundupRuleAmount(double transactionAmount, double ruleAmount) {
+        double positiveTransactionAmount = Math.abs(transactionAmount);
+        return roundupToNearest(positiveTransactionAmount, ruleAmount) - positiveTransactionAmount;
+    }
+
+    static double roundupToNearest(double transactionAmount, double ruleAmount) {
+        return ruleAmount * Math.ceil(transactionAmount / ruleAmount);
     }
 }
