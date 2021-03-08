@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class StandardSavingsRulesServiceTest {
+
     private static final double DELTA = 0.000001;
 
     @Test

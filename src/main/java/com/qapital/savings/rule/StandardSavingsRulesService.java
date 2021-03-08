@@ -6,8 +6,8 @@ import com.qapital.savings.event.SavingsEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -51,7 +51,7 @@ public class StandardSavingsRulesService implements SavingsRulesService {
     static List<SavingsEvent> executeRule(SavingsRule savingsRule, Transaction transaction) {
         double savingsAmountTotal = getSavingsAmountTotal(savingsRule, transaction);
         if (savingsAmountTotal == 0) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         double amount = savingsAmountTotal / savingsRule.getSavingsGoalIds().size();
