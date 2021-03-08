@@ -42,6 +42,15 @@ public class SavingsEvent {
 		this.created = Instant.now();
 	}
 
+	public static SavingsEvent ofRuleApplication(SavingsRule savingsRule, double amount, long savingsGoalId) {
+		long userId = savingsRule.getUserId();
+		long savingsRuleId = savingsRule.getId();
+		SavingsEvent.EventName eventName = SavingsEvent.EventName.rule_application;
+		LocalDate date = LocalDate.now();
+		Long triggerId = null;
+		return new SavingsEvent(userId, savingsGoalId, savingsRuleId, eventName, date, amount, triggerId, savingsRule);
+	}
+
 	public Long getId() {
 		return id;
 	}
